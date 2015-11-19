@@ -28,6 +28,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "HockeySDKEnums.h"
 
 /* NSString helpers */
 NSString *bit_URLEncodedString(NSString *inputString);
@@ -52,7 +53,11 @@ BOOL bit_hasEmbeddedMobileProvision(void);
 BOOL bit_isRunningInTestFlightEnvironment(void);
 BOOL bit_isRunningInAppStoreEnvironment(void);
 BOOL bit_isRunningInAppExtension(void);
-
+/* Environment Helper */
+/**
+ * Use this to set what environments you want HockeyApp to run under. We have it enabled in the AppStore.
+ */
+BOOL shouldRunInCurrentEnvironment(BITEnvironment environment);
 #if !defined (HOCKEYSDK_CONFIGURATION_ReleaseCrashOnly) && !defined (HOCKEYSDK_CONFIGURATION_ReleaseCrashOnlyExtensions)
 NSString *bit_validAppIconStringFromIcons(NSBundle *resourceBundle, NSArray *icons);
 NSString *bit_validAppIconFilename(NSBundle *bundle, NSBundle *resourceBundle);
@@ -67,4 +72,5 @@ UIImage *bit_imageWithContentsOfResolutionIndependentFile(NSString * path);
 UIImage *bit_imageNamed(NSString *imageName, NSString *bundleName);
 UIImage *bit_screenshot(void);
 UIImage *bit_appIcon(void);
+
 #endif

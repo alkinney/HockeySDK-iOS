@@ -217,7 +217,7 @@ typedef NS_ENUM(NSUInteger, BITAuthenticatorAppRestrictionEnforcementFrequency) 
  *
  * @see identificationType
  */
-@property (nonatomic, assign) NSString *providedEmail;
+@property (nonatomic, copy) NSString *userEmail;
 
 #pragma mark - Device based identification
 

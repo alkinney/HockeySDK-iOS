@@ -82,8 +82,8 @@ static unsigned char kBITPNGEndChunk[4] = {0x49, 0x45, 0x4e, 0x44};
 
 #pragma mark - BITHockeyBaseManager overrides
 - (void)startManager {
-  //disabled in TestFlight and the AppStore
-  if(self.appEnvironment != BITEnvironmentOther) return;
+  //disabled in TestFlight
+  if(!shouldRunInCurrentEnvironment(self.appEnvironment)) return;
   
   _isSetup = YES;
 }
@@ -109,8 +109,8 @@ static unsigned char kBITPNGEndChunk[4] = {0x49, 0x45, 0x4e, 0x44};
 }
 
 - (void)authenticateInstallation {
-  //disabled in TestFlight and the AppStore
-  if(self.appEnvironment != BITEnvironmentOther) return;
+  //disabled in TestFlight
+  if(!shouldRunInCurrentEnvironment(self.appEnvironment)) return;
   
   // make sure this is called after startManager so all modules are fully setup
   if (!_isSetup) {
@@ -239,7 +239,7 @@ static unsigned char kBITPNGEndChunk[4] = {0x49, 0x45, 0x4e, 0x44};
         if(completion) completion(NO, error);
         return;
       }
-      [self handleAuthenticationWithEmail:[self providedEmail] password:@"" completion:completion];
+      [self handleAuthenticationWithEmail:[self userEmail] password:nil completion:completion];
       return;
       break;
   }
@@ -321,7 +321,7 @@ static unsigned char kBITPNGEndChunk[4] = {0x49, 0x45, 0x4e, 0x44};
       if(nil == self.authenticationSecret) {
         error = [NSError errorWithDomain:kBITAuthenticatorErrorDomain
                                     code:BITAuthenticatorEmailMissing
-                                userInfo:@{NSLocalizedDescriptionKey : @"For transparent email validation, the provided email must be set"}];
+                                userInfo:@{NSLocalizedDescriptionKey : BITHockeyLocalizedString(@"HockeyAuthenticationMissingEmail")}];
         requirementsFulfilled = NO;
         break;
       }
@@ -352,9 +352,7 @@ static unsigned char kBITPNGEndChunk[4] = {0x49, 0x45, 0x4e, 0x44};
     return;
   }
   
-  id nsurlsessionClass = NSClassFromString(@"NSURLSessionUploadTask");
-  BOOL isSessionSupported = (nsurlsessionClass && !bit_isRunningInAppExtension());
-  [self validateWithCompletion:completion sessionSupported:isSessionSupported];
+  [self validateWithCompletion:completion sessionSupported:YES];
 }
 
 -(void)validateWithCompletion:(void (^)(BOOL validated, NSError *))completion sessionSupported:(BOOL)isSessionSupported {
@@ -471,15 +469,13 @@ static unsigned char kBITPNGEndChunk[4] = {0x49, 0x45, 0x4e, 0x44};
 
 #pragma mark - App Provided Authentication Parameters
 - (void)handleAuthenticationWithEmail:(NSString *)email
-                            password:(NSString *)password
-                          completion:(void (^)(BOOL, NSError *))completion {
+                             password:(NSString *)password
+                           completion:(void (^)(BOOL, NSError *))completion {
   NSParameterAssert(email && email.length);
-  NSParameterAssert(self.identificationType == BITAuthenticatorIdentificationTypeHockeyAppEmail ||self.identificationType == BITAuthenticatorIdentificationTypeHockeyAppEmailTransparent|| (password && password.length));
+  NSParameterAssert(self.identificationType == BITAuthenticatorIdentificationTypeHockeyAppEmail || self.identificationType == BITAuthenticatorIdentificationTypeHockeyAppEmailTransparent || password.length);
   NSURLRequest* request = [self requestForAuthenticationEmail:email password:password];
   
-  id nsurlsessionClass = NSClassFromString(@"NSURLSessionUploadTask");
-  BOOL isURLSessionSupported = (nsurlsessionClass && !bit_isRunningInAppExtension());
-  [self handleAuthenticationWithEmail:email request:request urlSessionSupported:isURLSessionSupported completion:completion];
+  [self handleAuthenticationWithEmail:email request:request urlSessionSupported:YES completion:completion];
 }
 
 - (void)handleAuthenticationWithEmail:(NSString *)email
@@ -516,11 +512,7 @@ static unsigned char kBITPNGEndChunk[4] = {0x49, 0x45, 0x4e, 0x44};
   NSParameterAssert(self.identificationType == BITAuthenticatorIdentificationTypeHockeyAppEmail || (password && password.length));
   NSURLRequest* request = [self requestForAuthenticationEmail:email password:password];
   
-  
-  
-  id nsurlsessionClass = NSClassFromString(@"NSURLSessionUploadTask");
-  BOOL isURLSessionSupported = (nsurlsessionClass && !bit_isRunningInAppExtension());
-  [self authenticationViewController:viewController handleAuthenticationWithEmail:email request:request urlSessionSupported:isURLSessionSupported completion:completion];
+  [self authenticationViewController:viewController handleAuthenticationWithEmail:email request:request urlSessionSupported:YES completion:completion];
 }
 
 - (void)authenticationViewController:(UIViewController *)viewController

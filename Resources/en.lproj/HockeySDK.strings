@@ -269,6 +269,7 @@
 /* Error presented to the user if authentication failed because of networking issues */
 "HockeyAuthenticationViewControllerNetworkError" = "Failed to authorize because your device appears to be disconnected from the Internet. Please try again.";
 
+"HockeyAuthenticationMissingEmail" = "A user email was not provided. Please try again or contact the developer of this app.";
 "HockeyAuthenticationFailedAuthenticate" = "Failed to authorize. Please try again or contact the developer of this app.";
 "HockeyAuthenticationNotMember" = "You are not authorized to use this app. Please contact the developer of this app.";
 "HockeyAuthenticationContactDeveloper" = "Authorization error. Please contact the developer of this app.";

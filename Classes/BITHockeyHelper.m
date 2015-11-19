@@ -857,4 +857,9 @@ UIImage *bit_screenshot(void) {
   return image;
 }
 
+BOOL shouldRunInCurrentEnvironment(BITEnvironment environment)
+{
+  return (environment == BITEnvironmentOther || environment == BITEnvironmentAppStore);
+}
+
 #endif

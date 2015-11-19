@@ -36,7 +36,7 @@
  * _Default_: Enabled
  */
 #ifndef HOCKEYSDK_FEATURE_CRASH_REPORTER
-#    define HOCKEYSDK_FEATURE_CRASH_REPORTER 1
+#    define HOCKEYSDK_FEATURE_CRASH_REPORTER 0
 #endif /* HOCKEYSDK_FEATURE_CRASH_REPORTER */
 
 
@@ -46,7 +46,7 @@
  * _Default_: Enabled
  */
 #ifndef HOCKEYSDK_FEATURE_FEEDBACK
-#    define HOCKEYSDK_FEATURE_FEEDBACK 1
+#    define HOCKEYSDK_FEATURE_FEEDBACK 0
 #endif /* HOCKEYSDK_FEATURE_FEEDBACK */
 
 
@@ -56,7 +56,7 @@
  * _Default_: Enabled
  */
 #ifndef HOCKEYSDK_FEATURE_STORE_UPDATES
-#    define HOCKEYSDK_FEATURE_STORE_UPDATES 1
+#    define HOCKEYSDK_FEATURE_STORE_UPDATES 0
 #endif /* HOCKEYSDK_FEATURE_STORE_UPDATES */
 
 
@@ -79,5 +79,13 @@
 #    define HOCKEYSDK_FEATURE_UPDATES 1
 #endif /* HOCKEYSDK_FEATURE_UPDATES */
 
+/**
+ * If true, include support for handling crash reports
+ *
+ * _Default_: Disabled
+ */
+#ifndef HOCKEYSDK_FEATURE_HEADLESS
+#    define HOCKEYSDK_FEATURE_HEADLESS 1
+#endif /* HOCKEYSDK_FEATURE_HEADLESS */
 
 #endif /* HockeySDK_HockeySDKFeatureConfig_h */

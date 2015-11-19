@@ -110,7 +110,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 }
 
 - (void)logInvalidIdentifier:(NSString *)environment {
-  if (self.appEnvironment != BITEnvironmentAppStore) {
+  if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
     if ([environment isEqualToString:@"liveIdentifier"]) {
       NSLog(@"[HockeySDK] WARNING: The liveIdentifier is invalid! The SDK will be disabled when deployed to the App Store without setting a valid app identifier!");
     } else {
@@ -133,6 +133,8 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
   
   return sharedInstance;
 }
+
+
 
 - (id)init {
   if ((self = [super init])) {
@@ -184,7 +186,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 - (void)dealloc {
 #if HOCKEYSDK_FEATURE_AUTHENTICATOR
   // start Authenticator
-  if (self.appEnvironment != BITEnvironmentAppStore) {
+  if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
     [_authenticator removeObserver:self forKeyPath:@"identified"];
   }
 #endif
@@ -291,7 +293,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
   
 #if HOCKEYSDK_FEATURE_AUTHENTICATOR
   // start Authenticator
-  if (self.appEnvironment != BITEnvironmentAppStore) {
+  if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
     // hook into manager with kvo!
     [_authenticator addObserver:self forKeyPath:@"identified" options:0 context:nil];
     
@@ -307,7 +309,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
   BOOL isIdentified = NO;
 
 #if HOCKEYSDK_FEATURE_AUTHENTICATOR
-  if (self.appEnvironment != BITEnvironmentAppStore)
+  if (shouldRunInCurrentEnvironment(self.appEnvironment))
     isIdentified = [self.authenticator isIdentified];
 #endif /* HOCKEYSDK_FEATURE_AUTHENTICATOR */
 
@@ -366,7 +368,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 
 
 - (void)setDelegate:(id<BITHockeyManagerDelegate>)delegate {
-  if (self.appEnvironment != BITEnvironmentAppStore) {
+  if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
     if (_startManagerIsInvoked) {
       NSLog(@"[HockeySDK] ERROR: The `delegate` property has to be set before calling [[BITHockeyManager sharedHockeyManager] startManager] !");
     }
@@ -487,7 +489,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
   if ([keyPath isEqualToString:@"identified"] &&
       [object valueForKey:@"isIdentified"] ) {
-    if (self.appEnvironment != BITEnvironmentAppStore) {
+    if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
       BOOL identified = [(NSNumber *)[object valueForKey:@"isIdentified"] boolValue];
       if (identified && ![self isUpdateManagerDisabled]) {
         [self invokeStartUpdateManager];
@@ -588,7 +590,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 }
 
 - (void)validateStartManagerIsInvoked {
-  if (_validAppIdentifier && (self.appEnvironment != BITEnvironmentAppStore)) {
+  if (_validAppIdentifier && (shouldRunInCurrentEnvironment(self.appEnvironment))) {
     if (!_startManagerIsInvoked) {
       NSLog(@"[HockeySDK] ERROR: You did not call [[BITHockeyManager sharedHockeyManager] startManager] to startup the HockeySDK! Please do so after setting up all properties. The SDK is NOT running.");
     }
@@ -686,7 +688,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
     _authenticator.delegate = _delegate;
 #endif /* HOCKEYSDK_FEATURE_AUTHENTICATOR */
 
-    if (self.appEnvironment != BITEnvironmentAppStore) {
+    if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
       NSString *integrationFlowTime = [self integrationFlowTimeString];
       if (integrationFlowTime && [self integrationFlowStartedWithTimeString:integrationFlowTime]) {
         [self pingServerForIntegrationStartWorkflowWithTimeString:integrationFlowTime appIdentifier:_appIdentifier];
