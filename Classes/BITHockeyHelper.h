@@ -38,6 +38,7 @@ NSString *bit_settingsDir(void);
 
 BOOL bit_validateEmail(NSString *email);
 NSString *bit_keychainHockeySDKServiceName(void);
+
 NSComparisonResult bit_versionCompare(NSString *stringA, NSString *stringB);
 NSString *bit_mainBundleIdentifier(void);
 NSString *bit_encodeAppIdentifier(NSString *inputString);

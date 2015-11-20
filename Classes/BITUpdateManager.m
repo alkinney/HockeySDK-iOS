@@ -1049,7 +1049,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
       
       self.companyName = (([[json valueForKey:@"company"] isKindOfClass:[NSString class]]) ? [json valueForKey:@"company"] : nil);
       
-      if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
+      if (self.appEnvironment == BITEnvironmentOther) {
         NSArray *feedArray = (NSArray *)[json valueForKey:@"versions"];
         
         // remember that we just checked the server

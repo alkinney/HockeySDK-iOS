@@ -77,8 +77,6 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 
 - (BOOL)shouldUseLiveIdentifier;
 
-
-
 @end
 
 
@@ -98,6 +96,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 }
 
 #pragma mark - Private Class Methods
+
 - (BOOL)checkValidityOfAppIdentifier:(NSString *)identifier {
   BOOL result = NO;
   
@@ -520,7 +519,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 }
 
 - (BOOL)integrationFlowStartedWithTimeString:(NSString *)timeString {
-  if (timeString == nil || (!(shouldRunInCurrentEnvironment(self.appEnvironment)))) {
+  if (timeString == nil || (self.appEnvironment == BITEnvironmentAppStore)) {
     return NO;
   }
   

@@ -326,6 +326,11 @@ BOOL bit_isRunningInAppExtension(void) {
   return isRunningInAppExtension;
 }
 
+BOOL shouldRunInCurrentEnvironment(BITEnvironment environment)
+{
+	return (environment == BITEnvironmentOther || environment == BITEnvironmentAppStore);
+}
+
 #if !defined (HOCKEYSDK_CONFIGURATION_ReleaseCrashOnly) && !defined (HOCKEYSDK_CONFIGURATION_ReleaseCrashOnlyExtensions)
 
 /**
@@ -860,11 +865,6 @@ UIImage *bit_screenshot(void) {
   UIGraphicsEndImageContext();
   
   return image;
-}
-
-BOOL shouldRunInCurrentEnvironment(BITEnvironment environment)
-{
-  return (environment == BITEnvironmentOther || environment == BITEnvironmentAppStore);
 }
 
 #endif

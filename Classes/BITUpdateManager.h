@@ -121,6 +121,8 @@ typedef NS_ENUM (NSUInteger, BITUpdateSetting) {
  @see checkForUpdate
  */
 @property (nonatomic, assign, getter=isCheckForUpdateOnLaunch) BOOL checkForUpdateOnLaunch;
+
+
 // manually start an update check
 /**
  Check for an update
@@ -251,5 +253,6 @@ typedef NS_ENUM (NSUInteger, BITUpdateSetting) {
  e.g. to push it onto a navigation stack.
  */
 - (BITUpdateViewController *)hockeyViewController:(BOOL)modal;
+
 
 @end
