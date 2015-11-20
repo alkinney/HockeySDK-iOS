@@ -79,13 +79,5 @@
 #    define HOCKEYSDK_FEATURE_UPDATES 1
 #endif /* HOCKEYSDK_FEATURE_UPDATES */
 
-/**
- * If true, include support for handling crash reports
- *
- * _Default_: Disabled
- */
-#ifndef HOCKEYSDK_FEATURE_HEADLESS
-#    define HOCKEYSDK_FEATURE_HEADLESS 1
-#endif /* HOCKEYSDK_FEATURE_HEADLESS */
 
 #endif /* HockeySDK_HockeySDKFeatureConfig_h */

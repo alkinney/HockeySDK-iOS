@@ -116,10 +116,6 @@ NSString *bit_keychainHockeySDKServiceName(void) {
   return serviceName;
 }
 
-NSComparisonResult compareTimestampToBundleVersion(NSDate *timeStamp, NSDate *bundleVersionDate) {
-  return [timeStamp compare:bundleVersionDate];
-}
-
 NSComparisonResult bit_versionCompare(NSString *stringA, NSString *stringB) {
   // Extract plain version number from self
   NSString *plainSelf = stringA;

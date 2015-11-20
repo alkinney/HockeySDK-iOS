@@ -12,7 +12,7 @@
 /**
  *  HockeySDK App environment
  */
-typedef NS_OPTIONS(NSUInteger, BITEnvironment) {
+typedef NS_ENUM(NSInteger, BITEnvironment) {
   /**
    *  App has been downloaded from the AppStore
    */
