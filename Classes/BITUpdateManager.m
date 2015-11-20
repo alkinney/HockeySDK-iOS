@@ -54,7 +54,6 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 @implementation BITUpdateManager {
   NSString *_currentAppVersion;
-  NSString *_currentAppVersionShort;
   
   BITUpdateViewController *_currentHockeyViewController;
   
@@ -362,10 +361,9 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 - (NSComparisonResult)compareToCurrentVersion:(BITAppVersionMetaInfo *)otherVersion
 {
-  if ([self useVersionShortForVersion]) {
-    return bit_shortVersionCompare(otherVersion.shortVersion, self.currentAppVersionShort);
-  }
-  else {
+  if ([self useTimestampForVersion]) {
+    return [otherVersion.date compare:self.currentVersionDate];
+  } else {
     return bit_versionCompare(otherVersion.version, self.currentAppVersion);
   }
 }
@@ -405,14 +403,9 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
           }
         }];
       }
-    } else {
-      if ([self useVersionShortForVersion]){
-        
-      } else {
+    } else if (![self useTimestampForVersion]){
         if ([self.newestAppVersion.versionID compare:_versionID] == NSOrderedDescending)
           self.updateAvailable = YES;
-      }
-
     }
   }
 }
@@ -469,7 +462,6 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
     _updateAvailable = NO;
     _lastCheckFailed = NO;
     _currentAppVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
-    _currentAppVersionShort = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     _blockingView = nil;
     _lastCheck = nil;
     _uuid = [[self executableUUID] copy];
@@ -486,7 +478,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
     self.alwaysShowUpdateReminder = YES;
     self.checkForUpdateOnLaunch = YES;
     self.updateSetting = BITUpdateCheckStartup;
-    self.useVersionShortForVersion = YES;
+    self.useTimestampForVersion = YES;
     
     if ([[NSUserDefaults standardUserDefaults] objectForKey:kBITUpdateDateOfLastCheck]) {
       // we did write something else in the past, so for compatibility reasons do this
@@ -1291,10 +1283,6 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
   return _currentAppVersion;
 }
 
-- (NSString *)currentAppVersionShort {
-  return _currentAppVersionShort;
-}
-
 - (void)setLastCheck:(NSDate *)aLastCheck {
   if (_lastCheck != aLastCheck) {
     _lastCheck = [aLastCheck copy];
@@ -1324,10 +1312,10 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 - (BITAppVersionMetaInfo *)newestAppVersion {
   BITAppVersionMetaInfo *newestVersion  = [_appVersions objectAtIndex:0];
-  if ([self useVersionShortForVersion]) {
+  if ([self useTimestampForVersion]) {
     for (BITAppVersionMetaInfo *appVersion in self.appVersions) {
       NSComparisonResult comparisonResult = [self compareToCurrentVersion:appVersion];
-      if (comparisonResult ==NSOrderedDescending) {
+      if (comparisonResult !=NSOrderedAscending) {
         newestVersion = appVersion;
       }
     }

@@ -116,26 +116,8 @@ NSString *bit_keychainHockeySDKServiceName(void) {
   return serviceName;
 }
 
-NSInteger getShortVersionNumber(NSString *shortVersion)
-{
-  NSScanner *scanner = [NSScanner scannerWithString:shortVersion];
-  NSCharacterSet *openParen = [NSCharacterSet characterSetWithCharactersInString:@"("];
-  NSCharacterSet *numbers = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
-  
-  [scanner scanUpToCharactersFromSet:openParen intoString:NULL];
-  
-  NSString *numberString;
-  [scanner scanCharactersFromSet:numbers intoString:&numberString];
-  
-  return [numberString integerValue];
-}
-
-NSComparisonResult bit_shortVersionCompare(NSString *stringA, NSString *stringB) {
-  NSInteger versionA = getShortVersionNumber(stringA);
-  NSInteger versionB = getShortVersionNumber(stringB);
-  if (versionA < versionB) return NSOrderedAscending;
-  else if (versionB < versionA) return NSOrderedDescending;
-  else return NSOrderedSame;
+NSComparisonResult compareTimestampToBundleVersion(NSDate *timeStamp, NSDate *bundleVersionDate) {
+  return [timeStamp compare:bundleVersionDate];
 }
 
 NSComparisonResult bit_versionCompare(NSString *stringA, NSString *stringB) {

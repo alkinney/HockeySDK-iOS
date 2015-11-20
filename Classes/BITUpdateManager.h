@@ -135,15 +135,25 @@ typedef NS_ENUM (NSUInteger, BITUpdateSetting) {
 - (void)checkForUpdate;
 
 /**
- Use the version short instead of the app version to determine if we should update.
+ Use the timestamp instead of the CFBundleVersion to determine if we should update.
  
  Call this to trigger a check if there is a new update available on the HockeyApp servers.
 
+ You MUST set currentVersionDate if you want this to work correctly!
+ 
  *Default*: _YES_
  Will change the default to NO if we send a Pull request for this.
+ 
+ @see currentVersionDate
  */
-@property (nonatomic, assign) BOOL useVersionShortForVersion;
+@property (nonatomic, assign) BOOL useTimestampForVersion;
 
+/**
+ Manually set the current version date - this is used for comparing the timestamp to
+ the version date.
+ 
+ */
+@property (nonatomic, strong) NSDate *currentVersionDate;
 ///-----------------------------------------------------------------------------
 /// @name Update Notification
 ///-----------------------------------------------------------------------------

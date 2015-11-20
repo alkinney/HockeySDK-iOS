@@ -38,9 +38,7 @@ NSString *bit_settingsDir(void);
 
 BOOL bit_validateEmail(NSString *email);
 NSString *bit_keychainHockeySDKServiceName(void);
-NSInteger getShortVersionNumber(NSString *shortVersion);
 NSComparisonResult bit_versionCompare(NSString *stringA, NSString *stringB);
-NSComparisonResult bit_shortVersionCompare(NSString *stringA, NSString *stringB);
 NSString *bit_mainBundleIdentifier(void);
 NSString *bit_encodeAppIdentifier(NSString *inputString);
 NSString *bit_appName(NSString *placeHolderString);
