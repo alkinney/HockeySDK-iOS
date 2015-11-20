@@ -54,6 +54,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 @implementation BITUpdateManager {
   NSString *_currentAppVersion;
+  NSString *_currentAppVersionShort;
   
   BITUpdateViewController *_currentHockeyViewController;
   
@@ -359,13 +360,21 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
   }
 }
 
+- (NSComparisonResult)compareToCurrentVersion:(BITAppVersionMetaInfo *)otherVersion
+{
+  if ([self useVersionShortForVersion]) {
+    return bit_shortVersionCompare(otherVersion.shortVersion, self.currentAppVersionShort);
+  }
+  else {
+    return bit_versionCompare(otherVersion.version, self.currentAppVersion);
+  }
+}
 
 #pragma mark - Cache
 
 - (void)checkUpdateAvailable {
   // check if there is an update available
-  NSComparisonResult comparisonResult = bit_versionCompare(self.newestAppVersion.version, self.currentAppVersion);
-  
+  NSComparisonResult comparisonResult = [self compareToCurrentVersion:self.newestAppVersion];
   if (comparisonResult == NSOrderedDescending) {
     self.updateAvailable = YES;
   } else if (comparisonResult == NSOrderedSame) {
@@ -379,7 +388,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
       } else {
         [self.appVersions enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
           if (idx > 0 && [obj isKindOfClass:[BITAppVersionMetaInfo class]]) {
-            NSComparisonResult compareVersions = bit_versionCompare([(BITAppVersionMetaInfo *)obj version], self.currentAppVersion);
+            NSComparisonResult compareVersions = [self compareToCurrentVersion:(BITAppVersionMetaInfo*)obj];
             BOOL uuidFound = [(BITAppVersionMetaInfo *)obj hasUUID:_uuid];
 
             if (uuidFound) {
@@ -397,8 +406,13 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
         }];
       }
     } else {
-      if ([self.newestAppVersion.versionID compare:_versionID] == NSOrderedDescending)
-        self.updateAvailable = YES;
+      if ([self useVersionShortForVersion]){
+        
+      } else {
+        if ([self.newestAppVersion.versionID compare:_versionID] == NSOrderedDescending)
+          self.updateAvailable = YES;
+      }
+
     }
   }
 }
@@ -455,6 +469,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
     _updateAvailable = NO;
     _lastCheckFailed = NO;
     _currentAppVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+    _currentAppVersionShort = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     _blockingView = nil;
     _lastCheck = nil;
     _uuid = [[self executableUUID] copy];
@@ -471,6 +486,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
     self.alwaysShowUpdateReminder = YES;
     self.checkForUpdateOnLaunch = YES;
     self.updateSetting = BITUpdateCheckStartup;
+    self.useVersionShortForVersion = YES;
     
     if ([[NSUserDefaults standardUserDefaults] objectForKey:kBITUpdateDateOfLastCheck]) {
       // we did write something else in the past, so for compatibility reasons do this
@@ -1041,7 +1057,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
       
       self.companyName = (([[json valueForKey:@"company"] isKindOfClass:[NSString class]]) ? [json valueForKey:@"company"] : nil);
       
-      if (self.appEnvironment == BITEnvironmentOther) {
+      if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
         NSArray *feedArray = (NSArray *)[json valueForKey:@"versions"];
         
         // remember that we just checked the server
@@ -1249,7 +1265,8 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
   BOOL result = NO;
   
   for (BITAppVersionMetaInfo *appVersion in self.appVersions) {
-    if ([appVersion.version isEqualToString:self.currentAppVersion] || bit_versionCompare(appVersion.version, self.currentAppVersion) == NSOrderedAscending) {
+    NSComparisonResult comparisonResult = [self compareToCurrentVersion:appVersion];
+    if (comparisonResult == NSOrderedSame || comparisonResult == NSOrderedAscending) {
       break;
     }
     
@@ -1272,6 +1289,10 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 - (NSString *)currentAppVersion {
   return _currentAppVersion;
+}
+
+- (NSString *)currentAppVersionShort {
+  return _currentAppVersionShort;
 }
 
 - (void)setLastCheck:(NSDate *)aLastCheck {
@@ -1302,8 +1323,16 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 }
 
 - (BITAppVersionMetaInfo *)newestAppVersion {
-  BITAppVersionMetaInfo *appVersion = [_appVersions objectAtIndex:0];
-  return appVersion;
+  BITAppVersionMetaInfo *newestVersion  = [_appVersions objectAtIndex:0];
+  if ([self useVersionShortForVersion]) {
+    for (BITAppVersionMetaInfo *appVersion in self.appVersions) {
+      NSComparisonResult comparisonResult = [self compareToCurrentVersion:appVersion];
+      if (comparisonResult ==NSOrderedDescending) {
+        newestVersion = appVersion;
+      }
+    }
+  }
+  return newestVersion;
 }
 
 - (void)setBlockingView:(UIView *)anBlockingView {

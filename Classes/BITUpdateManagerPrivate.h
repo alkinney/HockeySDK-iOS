@@ -98,6 +98,9 @@
 // convenience method to get current running version string
 - (NSString *)currentAppVersion;
 
+// convenience method to get current running version short string
+- (NSString *)currentAppVersionShort;
+
 // get newest app version
 - (BITAppVersionMetaInfo *)newestAppVersion;
 

@@ -31,6 +31,7 @@
 #import "BITKeychainUtils.h"
 #import "HockeySDK.h"
 #import "HockeySDKPrivate.h"
+#import "BITAppVersionMetaInfo.h"
 #if !defined (HOCKEYSDK_CONFIGURATION_ReleaseCrashOnly) && !defined (HOCKEYSDK_CONFIGURATION_ReleaseCrashOnlyExtensions)
 #import <QuartzCore/QuartzCore.h>
 #endif
@@ -113,6 +114,28 @@ NSString *bit_keychainHockeySDKServiceName(void) {
   });
   
   return serviceName;
+}
+
+NSInteger getShortVersionNumber(NSString *shortVersion)
+{
+  NSScanner *scanner = [NSScanner scannerWithString:shortVersion];
+  NSCharacterSet *openParen = [NSCharacterSet characterSetWithCharactersInString:@"("];
+  NSCharacterSet *numbers = [NSCharacterSet characterSetWithCharactersInString:@"0123456789"];
+  
+  [scanner scanUpToCharactersFromSet:openParen intoString:NULL];
+  
+  NSString *numberString;
+  [scanner scanCharactersFromSet:numbers intoString:&numberString];
+  
+  return [numberString integerValue];
+}
+
+NSComparisonResult bit_shortVersionCompare(NSString *stringA, NSString *stringB) {
+  NSInteger versionA = getShortVersionNumber(stringA);
+  NSInteger versionB = getShortVersionNumber(stringB);
+  if (versionA < versionB) return NSOrderedAscending;
+  else if (versionB < versionA) return NSOrderedDescending;
+  else return NSOrderedSame;
 }
 
 NSComparisonResult bit_versionCompare(NSString *stringA, NSString *stringB) {

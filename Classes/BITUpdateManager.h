@@ -121,8 +121,6 @@ typedef NS_ENUM (NSUInteger, BITUpdateSetting) {
  @see checkForUpdate
  */
 @property (nonatomic, assign, getter=isCheckForUpdateOnLaunch) BOOL checkForUpdateOnLaunch;
-
-
 // manually start an update check
 /**
  Check for an update
@@ -136,6 +134,15 @@ typedef NS_ENUM (NSUInteger, BITUpdateSetting) {
  */
 - (void)checkForUpdate;
 
+/**
+ Use the version short instead of the app version to determine if we should update.
+ 
+ Call this to trigger a check if there is a new update available on the HockeyApp servers.
+
+ *Default*: _YES_
+ Will change the default to NO if we send a Pull request for this.
+ */
+@property (nonatomic, assign) BOOL useVersionShortForVersion;
 
 ///-----------------------------------------------------------------------------
 /// @name Update Notification
@@ -234,6 +241,5 @@ typedef NS_ENUM (NSUInteger, BITUpdateSetting) {
  e.g. to push it onto a navigation stack.
  */
 - (BITUpdateViewController *)hockeyViewController:(BOOL)modal;
-
 
 @end
