@@ -433,6 +433,12 @@
  */
 @property (nonatomic, getter=isInstallTrackingDisabled) BOOL disableInstallTracking;
 
+/**
+ Override the table we look for strings in
+ 
+ *Default*: nil
+ */
+@property (nonatomic, retain) NSString *bundleTableOverride;
 ///-----------------------------------------------------------------------------
 /// @name Debug Logging
 ///-----------------------------------------------------------------------------
