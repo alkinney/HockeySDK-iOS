@@ -1316,7 +1316,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
     for (BITAppVersionMetaInfo *appVersion in self.appVersions) {
       NSComparisonResult comparisonResult = [self compareToCurrentVersion:appVersion];
       if (comparisonResult !=NSOrderedAscending) {
-MicrosoftBuildNumber        newestVersion = appVersion;
+        newestVersion = appVersion;
       }
     }
   }
