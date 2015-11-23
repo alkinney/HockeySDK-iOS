@@ -361,11 +361,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 - (NSComparisonResult)compareToCurrentVersion:(BITAppVersionMetaInfo *)otherVersion
 {
-  if ([self useTimestampForVersion]) {
-    return [otherVersion.date compare:self.currentVersionDate];
-  } else {
     return bit_versionCompare(otherVersion.version, self.currentAppVersion);
-  }
 }
 
 #pragma mark - Cache
@@ -403,10 +399,9 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
           }
         }];
       }
-    } else if (![self useTimestampForVersion]){
-        if ([self.newestAppVersion.versionID compare:_versionID] == NSOrderedDescending)
-          self.updateAvailable = YES;
     }
+      if ([self.newestAppVersion.versionID compare:_versionID] == NSOrderedDescending)
+          self.updateAvailable = YES;
   }
 }
 
@@ -478,7 +473,6 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
     self.alwaysShowUpdateReminder = YES;
     self.checkForUpdateOnLaunch = YES;
     self.updateSetting = BITUpdateCheckStartup;
-    self.useTimestampForVersion = YES;
     
     if ([[NSUserDefaults standardUserDefaults] objectForKey:kBITUpdateDateOfLastCheck]) {
       // we did write something else in the past, so for compatibility reasons do this
@@ -1312,14 +1306,6 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 - (BITAppVersionMetaInfo *)newestAppVersion {
   BITAppVersionMetaInfo *newestVersion  = [_appVersions objectAtIndex:0];
-  if ([self useTimestampForVersion]) {
-    for (BITAppVersionMetaInfo *appVersion in self.appVersions) {
-      NSComparisonResult comparisonResult = [self compareToCurrentVersion:appVersion];
-      if (comparisonResult !=NSOrderedAscending) {
-        newestVersion = appVersion;
-      }
-    }
-  }
   return newestVersion;
 }
 
