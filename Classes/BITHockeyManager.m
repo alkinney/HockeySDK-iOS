@@ -161,7 +161,8 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
     _appStoreEnvironment = NO;
     _startManagerIsInvoked = NO;
     _startUpdateManagerIsInvoked = NO;
-    
+    _bundleTableOverride = nil;
+    _bundleOverride = nil;
     _liveIdentifier = nil;
     _installString = bit_appAnonID(NO);
     _disableInstallTracking = NO;

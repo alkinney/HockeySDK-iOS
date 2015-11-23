@@ -51,14 +51,24 @@ NSBundle *BITHockeyBundle(void) {
 
 NSString *BITHockeyLocalizedString(NSString *stringToken) {
   if (!stringToken) return @"";
-  
+
   NSString *appSpecificLocalizationString = NSLocalizedString(stringToken, @"");
   if (appSpecificLocalizationString && ![stringToken isEqualToString:appSpecificLocalizationString]) {
     return appSpecificLocalizationString;
-  }else if ([[BITHockeyManager sharedHockeyManager] bundleTableOverride] != nil){
-    return NSLocalizedStringFromTable(stringToken, [[BITHockeyManager sharedHockeyManager] bundleTableOverride], @"");
-  }else if (BITHockeyBundle()) {
-    NSString *bundleSpecificLocalizationString = NSLocalizedStringFromTableInBundle(stringToken, @"HockeySDK", BITHockeyBundle(), @"");
+  }
+  NSBundle *bundle = BITHockeyBundle();
+  NSString *tableName = @"HockeySDK";
+  
+  if ([[BITHockeyManager sharedHockeyManager] bundleTableOverride] != nil){
+    tableName = [[BITHockeyManager sharedHockeyManager] bundleTableOverride];
+  }
+  
+  if ([[BITHockeyManager sharedHockeyManager] bundleOverride] != nil){
+    bundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:[[BITHockeyManager sharedHockeyManager] bundleOverride] ofType:@"bundle"]];
+  }
+  
+  if (bundle != nil) {
+    NSString *bundleSpecificLocalizationString = NSLocalizedStringFromTableInBundle(stringToken, tableName, bundle, @"");
     if (bundleSpecificLocalizationString)
       return bundleSpecificLocalizationString;
     return stringToken;

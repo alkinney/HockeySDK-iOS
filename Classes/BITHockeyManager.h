@@ -439,6 +439,12 @@
  *Default*: nil
  */
 @property (nonatomic, retain) NSString *bundleTableOverride;
+/**
+ Override the bundle we look for strings in
+ 
+ *Default*: nil
+ */
+@property (nonatomic, retain) NSString *bundleOverride;
 ///-----------------------------------------------------------------------------
 /// @name Debug Logging
 ///-----------------------------------------------------------------------------
