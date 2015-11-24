@@ -81,6 +81,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 
 
 @implementation BITHockeyManager {
+  NSString *_overrideVersion;
   NSString *_appIdentifier;
   NSString *_liveIdentifier;
   
@@ -166,6 +167,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
     _liveIdentifier = nil;
     _installString = bit_appAnonID(NO);
     _disableInstallTracking = NO;
+    _overrideVersion = nil;
     
 #if !TARGET_IPHONE_SIMULATOR
     // check if we are really in an app store environment
@@ -195,7 +197,12 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 
 
 #pragma mark - Public Instance Methods (Configuration)
+- (void)configureWithIdentifier:(NSString *)appIdentifier overrideVersion:(NSString*)overrideVersion {
+  _overrideVersion = overrideVersion;
+  [self configureWithIdentifier:appIdentifier];
+}
 
+- (void)configureWithIdentifier:(NSString *)appIdentifier{
   _appIdentifier = [appIdentifier copy];
   
   [self initializeModules];
@@ -519,6 +526,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 }
 
 - (BOOL)integrationFlowStartedWithTimeString:(NSString *)timeString {
+  if (timeString == nil || !shouldRunInCurrentEnvironment(self.appEnvironment)) {
     return NO;
   }
   
@@ -536,17 +544,25 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 }
 
 - (void)pingServerForIntegrationStartWorkflowWithTimeString:(NSString *)timeString appIdentifier:(NSString *)appIdentifier {
+  if (!appIdentifier || (!shouldRunInCurrentEnvironment(self.appEnvironment))) {
     return;
   }
   
   NSString *integrationPath = [NSString stringWithFormat:@"api/3/apps/%@/integration", bit_encodeAppIdentifier(appIdentifier)];
   
   BITHockeyLog(@"INFO: Sending integration workflow ping to %@", integrationPath);
+  NSString *bundleVersion;
+  
+  //We need to make sure the updateManager exists.
+  if (_overrideVersion)
+    bundleVersion = _overrideVersion;
+  else
+    bundleVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
   
   NSDictionary *params = @{@"timestamp": timeString,
                            @"sdk": BITHOCKEY_NAME,
                            @"sdk_version": BITHOCKEY_VERSION,
-                           @"bundle_version": [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]
+                           @"bundle_version": bundleVersion
                            };
   
   id nsurlsessionClass = NSClassFromString(@"NSURLSessionUploadTask");
@@ -665,6 +681,7 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
     BITHockeyLog(@"INFO: Setup UpdateManager");
     _updateManager = [[BITUpdateManager alloc] initWithAppIdentifier:_appIdentifier appEnvironment:_appEnvironment];
     _updateManager.delegate = _delegate;
+    _updateManager.overrideAppVersion = _overrideVersion;
 #endif /* HOCKEYSDK_FEATURE_UPDATES */
 
 #if HOCKEYSDK_FEATURE_STORE_UPDATES
