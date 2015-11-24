@@ -31,7 +31,6 @@
 #import "BITKeychainUtils.h"
 #import "HockeySDK.h"
 #import "HockeySDKPrivate.h"
-#import "BITAppVersionMetaInfo.h"
 #if !defined (HOCKEYSDK_CONFIGURATION_ReleaseCrashOnly) && !defined (HOCKEYSDK_CONFIGURATION_ReleaseCrashOnlyExtensions)
 #import <QuartzCore/QuartzCore.h>
 #endif

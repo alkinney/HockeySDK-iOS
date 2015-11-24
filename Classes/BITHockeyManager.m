@@ -196,7 +196,6 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 
 #pragma mark - Public Instance Methods (Configuration)
 
-- (void)configureWithIdentifier:(NSString *)appIdentifier {
   _appIdentifier = [appIdentifier copy];
   
   [self initializeModules];
@@ -520,7 +519,6 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 }
 
 - (BOOL)integrationFlowStartedWithTimeString:(NSString *)timeString {
-  if (timeString == nil || (self.appEnvironment == BITEnvironmentAppStore)) {
     return NO;
   }
   
@@ -538,7 +536,6 @@ bitstadium_info_t bitstadium_library_info __attribute__((section("__TEXT,__bit_h
 }
 
 - (void)pingServerForIntegrationStartWorkflowWithTimeString:(NSString *)timeString appIdentifier:(NSString *)appIdentifier {
-  if (!appIdentifier || (self.appEnvironment == BITEnvironmentAppStore)) {
     return;
   }
   

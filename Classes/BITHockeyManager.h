@@ -113,6 +113,17 @@
  */
 - (void)configureWithIdentifier:(NSString *)appIdentifier;
 
+/**
+ Initializes the manager with a particular app identifier
+ 
+ Initialize the manager with a HockeyApp app identifier.
+ 
+ Initialize the manager with an overriden version.
+ 
+ @param appIdentifier The app identifier that should be used.
+ @param overrideVersion The overriden version that should match what you input for the version in the HockeyAppManager
+ */
+- (void)configureWithIdentifier:(NSString *)appIdentifier overrideVersion:(NSString*)overrideVersion;
 
 /**
  Initializes the manager with a particular app identifier and delegate

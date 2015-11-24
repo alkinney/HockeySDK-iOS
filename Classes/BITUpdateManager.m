@@ -359,16 +359,13 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
   }
 }
 
-- (NSComparisonResult)compareToCurrentVersion:(BITAppVersionMetaInfo *)otherVersion
-{
-    return bit_versionCompare(otherVersion.version, self.currentAppVersion);
-}
 
 #pragma mark - Cache
 
 - (void)checkUpdateAvailable {
   // check if there is an update available
-  NSComparisonResult comparisonResult = [self compareToCurrentVersion:self.newestAppVersion];
+  NSComparisonResult comparisonResult = bit_versionCompare(self.newestAppVersion.version, self.currentAppVersion);
+  
   if (comparisonResult == NSOrderedDescending) {
     self.updateAvailable = YES;
   } else if (comparisonResult == NSOrderedSame) {
@@ -382,7 +379,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
       } else {
         [self.appVersions enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
           if (idx > 0 && [obj isKindOfClass:[BITAppVersionMetaInfo class]]) {
-            NSComparisonResult compareVersions = [self compareToCurrentVersion:(BITAppVersionMetaInfo*)obj];
+            NSComparisonResult compareVersions = bit_versionCompare([(BITAppVersionMetaInfo *)obj version], self.currentAppVersion);
             BOOL uuidFound = [(BITAppVersionMetaInfo *)obj hasUUID:_uuid];
 
             if (uuidFound) {
@@ -399,9 +396,10 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
           }
         }];
       }
-    }
+    } else {
       if ([self.newestAppVersion.versionID compare:_versionID] == NSOrderedDescending)
-          self.updateAvailable = YES;
+        self.updateAvailable = YES;
+    }
   }
 }
 
@@ -473,6 +471,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
     self.alwaysShowUpdateReminder = YES;
     self.checkForUpdateOnLaunch = YES;
     self.updateSetting = BITUpdateCheckStartup;
+    self.overrideAppVersion = nil;
     
     if ([[NSUserDefaults standardUserDefaults] objectForKey:kBITUpdateDateOfLastCheck]) {
       // we did write something else in the past, so for compatibility reasons do this
@@ -520,7 +519,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 #pragma mark - BetaUpdateUI
 
 - (BITUpdateViewController *)hockeyViewController:(BOOL)modal {
-  if (self.appEnvironment != BITEnvironmentOther) {
+  if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
     NSLog(@"[HockeySDK] This should not be called from an app store build!");
     // return an empty view controller instead
     BITHockeyBaseViewController *blankViewController = [[BITHockeyBaseViewController alloc] initWithModalStyle:modal];
@@ -530,7 +529,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 }
 
 - (void)showUpdateView {
-  if (self.appEnvironment != BITEnvironmentOther) {
+  if (!shouldRunInCurrentEnvironment(self.appEnvironment)) {
     NSLog(@"[HockeySDK] This should not be called from an app store build!");
     return;
   }
@@ -554,7 +553,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 
 - (void)showCheckForUpdateAlert {
-  if (self.appEnvironment != BITEnvironmentOther) return;
+  if (!shouldRunInCurrentEnvironment(self.appEnvironment)) return;
   if ([self isUpdateManagerDisabled]) return;
   
   if (!_updateAlertShowing) {
@@ -829,7 +828,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 }
 
 - (void)checkForUpdate {
-  if ((self.appEnvironment == BITEnvironmentOther) && ![self isUpdateManagerDisabled]) {
+  if ((shouldRunInCurrentEnvironment([self appEnvironment])) && ![self isUpdateManagerDisabled]) {
     if ([self expiryDateReached]) return;
     if (![self installationIdentified]) return;
     
@@ -842,7 +841,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 }
 
 - (void)checkForUpdateShowFeedback:(BOOL)feedback {
-  if (self.appEnvironment != BITEnvironmentOther) return;
+  if (!shouldRunInCurrentEnvironment(self.appEnvironment)) return;
   if (self.isCheckInProgress) return;
   
   _showFeedback = feedback;
@@ -919,7 +918,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 }
 
 - (BOOL)initiateAppDownload {
-  if (self.appEnvironment != BITEnvironmentOther) return NO;
+  if (!shouldRunInCurrentEnvironment(self.appEnvironment)) return NO;
   
   if (!self.isUpdateAvailable) {
     BITHockeyLog(@"WARNING: No update available. Aborting.");
@@ -988,7 +987,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 
 // begin the startup process
 - (void)startManager {
-  if (self.appEnvironment == BITEnvironmentOther) {
+  if (shouldRunInCurrentEnvironment([self appEnvironment])) {
     if ([self isUpdateManagerDisabled]) return;
     
     BITHockeyLog(@"INFO: Starting UpdateManager");
@@ -1043,7 +1042,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
       
       self.companyName = (([[json valueForKey:@"company"] isKindOfClass:[NSString class]]) ? [json valueForKey:@"company"] : nil);
       
-      if (self.appEnvironment == BITEnvironmentOther) {
+      if (shouldRunInCurrentEnvironment(self.appEnvironment)) {
         NSArray *feedArray = (NSArray *)[json valueForKey:@"versions"];
         
         // remember that we just checked the server
@@ -1251,8 +1250,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
   BOOL result = NO;
   
   for (BITAppVersionMetaInfo *appVersion in self.appVersions) {
-    NSComparisonResult comparisonResult = [self compareToCurrentVersion:appVersion];
-    if (comparisonResult == NSOrderedSame || comparisonResult == NSOrderedAscending) {
+    if ([appVersion.version isEqualToString:self.currentAppVersion] || bit_versionCompare(appVersion.version, self.currentAppVersion) == NSOrderedAscending) {
       break;
     }
     
@@ -1274,6 +1272,8 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 }
 
 - (NSString *)currentAppVersion {
+  if (self.overrideAppVersion != nil)
+    return self.overrideAppVersion;
   return _currentAppVersion;
 }
 
@@ -1305,8 +1305,8 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
 }
 
 - (BITAppVersionMetaInfo *)newestAppVersion {
-  BITAppVersionMetaInfo *newestVersion  = [_appVersions objectAtIndex:0];
-  return newestVersion;
+  BITAppVersionMetaInfo *appVersion = [_appVersions objectAtIndex:0];
+  return appVersion;
 }
 
 - (void)setBlockingView:(UIView *)anBlockingView {
