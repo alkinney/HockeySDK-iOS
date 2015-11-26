@@ -136,11 +136,6 @@ typedef NS_ENUM (NSUInteger, BITUpdateSetting) {
  */
 - (void)checkForUpdate;
 
-// Override the app bundle version if you're overriding it on the website
-/**
- Pick the CFBundleVersion you entered on the page after creating the version.
- */
-@property (nonatomic, copy) NSString* overrideAppVersion;
 
 ///-----------------------------------------------------------------------------
 /// @name Update Notification
@@ -239,6 +234,5 @@ typedef NS_ENUM (NSUInteger, BITUpdateSetting) {
  e.g. to push it onto a navigation stack.
  */
 - (BITUpdateViewController *)hockeyViewController:(BOOL)modal;
-
 
 @end

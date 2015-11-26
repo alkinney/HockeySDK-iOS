@@ -49,16 +49,26 @@ NSBundle *BITHockeyBundle(void) {
   return bundle;
 }
 
+//Load the CFBundleVersion checking for the override if there is one in HockeyAppVersion
+NSString *BITCurrentAppVersion(void) {
+  static NSString *currentVersion = nil;
+  static dispatch_once_t predicate;
+  dispatch_once(&predicate, ^{
+    currentVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"HockeyAppVersion"];
+    if (!currentVersion)
+      currentVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+  });
+  return currentVersion;
+}
+
 static NSString *BITHockeyLocalizedStringFromBundleInTable(NSString *stringToken, NSBundle *bundle, NSString *tableName)
 {
-  if (bundle != nil) {
+  if (bundle != nil && tableName != nil) {
     NSString *bundleSpecificLocalizationString = NSLocalizedStringFromTableInBundle(stringToken, tableName, bundle, @"");
     if (bundleSpecificLocalizationString)
       return bundleSpecificLocalizationString;
-    return stringToken;
-  } else {
-    return stringToken;
   }
+  return stringToken;
 }
 
 NSString *BITHockeyLocalizedString(NSString *stringToken) {
@@ -78,7 +88,7 @@ NSString *BITHockeyLocalizedString(NSString *stringToken) {
       tableName = [[BITHockeyManager sharedHockeyManager] bundleTableOverride];
       bundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:[[BITHockeyManager sharedHockeyManager] bundleOverride] ofType:@"bundle"]];
       localizedString = BITHockeyLocalizedStringFromBundleInTable(stringToken, bundle, tableName);
-      if (localizedString != nil)
+      if (localizedString != nil && ![localizedString isEqualToString:stringToken])
         return localizedString;
       }
   
