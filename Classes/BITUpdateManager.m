@@ -922,7 +922,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
     return NO;
   }
   
-#if TARGET_IPHONE_SIMULATOR
+#if TARGET_OS_SIMULATOR
   /* We won't use this for now until we have a more robust solution for displaying UIAlertController
   // requires iOS 8
   id uialertcontrollerClass = NSClassFromString(@"UIAlertController");
@@ -978,7 +978,7 @@ typedef NS_ENUM(NSInteger, BITUpdateAlertViewTag) {
   
   return success;
 
-#endif /* TARGET_IPHONE_SIMULATOR */
+#endif /* TARGET_OS_SIMULATOR */
 }
 
 
