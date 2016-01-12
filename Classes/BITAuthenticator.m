@@ -963,12 +963,8 @@ static unsigned char kBITPNGEndChunk[4] = {0x49, 0x45, 0x4e, 0x44};
   } else {
     BOOL success1 = [self addStringValueToKeychainForThisDeviceOnly:installationIdentifier
                                                              forKey:kBITAuthenticatorIdentifierKey];
-	if (!success1)
-		BITHockeyLog(@"Warning: success1 is false. Something went wrong adding the installation identifier to the keychain.");
     BOOL success2 = [self addStringValueToKeychainForThisDeviceOnly:[self.class stringForIdentificationType:type]
                                                              forKey:kBITAuthenticatorIdentifierTypeKey];
-	if (!success2)
-		BITHockeyLog(@"Warning: success2 is false. The something went wrong adding the identification type to the keychain");
     if (!success1 || !success2) {
       [self alertOnFailureStoringTokenInKeychain];
     }
